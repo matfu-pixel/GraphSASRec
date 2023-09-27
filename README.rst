@@ -15,16 +15,17 @@
 
 .. class:: center
 
-    :Название исследуемой задачи: Мое название работы
-    :Тип научной работы: M1P/НИР/CoIS
-    :Автор: Имя Отчество Фамилия
-    :Научный руководитель: степень, Фамилия Имя Отчество
-    :Научный консультант(при наличии): степень, Фамилия Имя Отчество
+    :Название исследуемой задачи: Распознавание эмоций персонажей в сцене фильма с помощью мультимодального трансформера
+    :Тип научной работы: M1P
+    :Автор: Артем Сергеевич Матвеев
+    :Научный руководитель: кандидат физико-математических наук, Майсурадзе Арчил Ивериевич
 
 Abstract
 ========
 
-Purus sit amet luctus venenatis lectus magna fringilla. Condimentum id venenatis a condimentum vitae sapien. Auctor neque vitae tempus quam pellentesque nec nam aliquam. Eget egestas purus viverra accumsan in. Nam aliquam sem et tortor. Donec et odio pellentesque diam volutpat commodo. Odio pellentesque diam volutpat commodo sed egestas. Sit amet dictum sit amet justo. Pellentesque sit amet porttitor eget. Imperdiet sed euismod nisi porta lorem mollis aliquam ut. Quis varius quam quisque id diam vel quam elementum. Ornare lectus sit amet est placerat in. Vulputate dignissim suspendisse in est ante. Elit sed vulputate mi sit amet mauris. Egestas sed tempus urna et pharetra pharetra. Viverra tellus in hac habitasse platea dictumst vestibulum rhoncus.
+В современном мире кинематограф играет важную роль в формировании общественного мнения и культуры. Каждый фильм имеет свои особенности, которые могут вызвать разные эмоции у зрителей. В данной курсовой работе мы попробуем автоматизировать процесс определения эмоций персонажей в кино с помощью хорошо зарекомендовавшей себя архитектуры трансформер. 
+
+Эмоции персонажей - это важная составляющая кинематографа, которая может влиять на восприятие зрителей и их реакцию на фильм. Определение эмоций персонажей может помочь режиссерам и сценаристам лучше понимать своих зрителей и создавать более эффективные фильмы. Кроме того, определение эмоций персонажей может иметь практическое применение в различных областях, таких как психология, маркетинг и реклама. Например, понимание эмоций персонажей может помочь в создании эффективной рекламной кампании или в разработке психологических тестов для оценки личности.
 
 Research publications
 ===============================
