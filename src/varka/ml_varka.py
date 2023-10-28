@@ -28,13 +28,13 @@ class MovieLenseVarka:
         last_timestamp = -1
         ans = []
         events = events.sort_values('Timestamp')
-        for movie, ts, title, genre, gender, age, occ, zc, yr in zip(events['MovieID'], events['Timestamp'], events['Title'], events['Genres'], events['Gender'], events['Age'], events['Occupation'], events['Zip-code'], events['FilmYear']):
-            queue.append([movie, title, genre, gender, age, occ, zc, yr, ts])
+        for movie, ts, title, genre, gender, age, occ, zc, yr, r in zip(events['MovieID'], events['Timestamp'], events['Title'], events['Genres'], events['Gender'], events['Age'], events['Occupation'], events['Zip-code'], events['FilmYear'], events['Rating']):
+            queue.append([movie, title, genre, gender, age, occ, zc, yr, ts, r])
             last_timestamp = ts
             if len(queue) > max_history_length + 1:
                 queue.popleft()
             if len(queue) > 1: 
-                ans.append((list(queue)[:-1], queue[-1], last_timestamp, movie))
+                ans.append((list(queue)[:-1], queue[-1], last_timestamp, movie, r, genre))
         return ans
 
     def do_varka(self):
@@ -52,11 +52,15 @@ class MovieLenseVarka:
         data['candidate'] = data[0].apply(lambda x: x[1])
         data['timestamp'] = data[0].apply(lambda x: x[2])
         data['MovieID'] = data[0].apply(lambda x: x[3])
-        data = data[['UserID', 'MovieID', 'history', 'candidate', 'timestamp']].sort_values('timestamp').reset_index()
+        data['Rating'] = data[0].apply(lambda x: x[4])
+        data['Genre'] = data[0].apply(lambda x: x[5])
+        data = data[['UserID', 'MovieID', 'Rating', 'history', 'candidate', 'timestamp', 'Genre']].sort_values('timestamp').reset_index()
         train = data[data.timestamp <= self._time_split].sample(frac=1)
         train = train.reset_index()
+        train = train[['UserID', 'MovieID', 'Rating', 'history', 'candidate', 'timestamp', 'Genre']]
         val = data[data.timestamp > self._time_split].sample(frac=1)
         val = val.reset_index()
+        val = val[['UserID', 'MovieID', 'Rating', 'history', 'candidate', 'timestamp', 'Genre']]
 
         train.to_pickle(self._train_output_path)
         val.to_pickle(self._val_output_path)
