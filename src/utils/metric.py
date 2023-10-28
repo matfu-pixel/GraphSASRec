@@ -1,5 +1,6 @@
 import pandas as pd
-import n
+import numpy as np
+
 
 class Metric:
     """
@@ -24,10 +25,14 @@ class RecallK(Metric):
     def __call__(self, df_preds):
         user_wise_recall_k = 0
         cnt = 0
-        for preds, positive in zip(df_preds['preds'], df_preds['positive']):
-            s = 0
-            if pd.isnull(preds):
+        for it, positive in zip(df_preds['preds'], df_preds['positive']):
+            if it == -1:
                 preds = []
+            else:
+                preds = []
+                for elem in it:
+                    preds.append(elem[0])
+            s = 0
             for movie in positive:
                 if movie in preds:
                     s += 1
@@ -48,12 +53,15 @@ class DiversityK(Metric):
     def __call__(self, df_preds):
         user_wise_diversity_k = 0
         cnt = 0
-        for genres in df_preds['genres']:
-            if pd.isnull(genres):
+        for genres in df_preds['preds']:
+            if genres == -1:
                 cnt += 1
             else:
+                tmp = []
+                for it in genres:
+                    tmp += it[2]
                 cnt += 1
-                user_wise_diversity_k += len(set(genres))
+                user_wise_diversity_k += len(set(tmp))
         return user_wise_diversity_k / cnt
 
 
@@ -69,11 +77,13 @@ class LongTailK(Metric):
     def __call__(self, df_preds):
         user_wise_popularity_k = 0
         cnt = 0
-        for popularity in df_preds['popularity']:
-            if pd.isnull(popularity):
+        for popularity in df_preds['preds']:
+            if popularity == -1:
                 continue
             else:
+                tmp = []
+                for it in popularity:
+                    tmp.append(it[1])
                 cnt += 1
-                user_wise_popularity_k += np.median(popularity)
-        return user_wise_popularity / cnt
-                
+                user_wise_popularity_k += np.median(tmp)
+        return user_wise_popularity_k / cnt
