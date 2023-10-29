@@ -47,9 +47,7 @@ class SASRec(torch.nn.Module):
             new_attn_layernorm = torch.nn.LayerNorm(args['hidden_units'], eps=1e-8)
             self.attention_layernorms.append(new_attn_layernorm)
 
-            new_attn_layer =  torch.nn.MultiheadAttention(args['hidden_units'],
-                                                            args['num_heads'],
-                                                            args['dropout_rate'])
+            new_attn_layer =  torch.nn.MultiheadAttention(args['hidden_units'], args['num_heads'], args['dropout_rate'])
             self.attention_layers.append(new_attn_layer)
 
             new_fwd_layernorm = torch.nn.LayerNorm(args['hidden_units'], eps=1e-8)
@@ -72,15 +70,11 @@ class SASRec(torch.nn.Module):
         timeline_mask = torch.cat([torch.full((log_seqs.shape[0], 1), False).to(self.dev), torch.BoolTensor(log_seqs == 0).to(self.dev)], dim=1)
         seqs *= ~timeline_mask.unsqueeze(-1)
 
-        # no causal mask <- !!!
-        # tl = seqs.shape[1]
-        # attention_mask = ~torch.tril(torch.ones((tl, tl), dtype=torch.bool, device=self.dev))
-
         for i in range(len(self.attention_layers)):
             seqs = torch.transpose(seqs, 0, 1)
             Q = self.attention_layernorms[i](seqs)
             mha_outputs, _ = self.attention_layers[i](Q, seqs, seqs)
-                                            # attn_mask=attention_mask) # no causal mask
+                                                # attn_mask=attention_mask) # no causal mask
             seqs = Q + mha_outputs
             seqs = torch.transpose(seqs, 0, 1)
 
