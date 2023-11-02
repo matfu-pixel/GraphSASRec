@@ -129,3 +129,5 @@ logs/
 *.aux
 *.synctex.gz
 *.fdb_latexmk
+*.pkl
+*.pth
