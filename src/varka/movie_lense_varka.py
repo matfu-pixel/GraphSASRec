@@ -20,7 +20,7 @@ class MovieLenseVarka:
         self._ratings = pd.read_table(ratings_path, sep='::', header=None, names=ratings_names, encoding='latin-1', engine='python')
 
         movies_names = ['MovieID', 'Title', 'Genres']
-        self._movies = pd.read_table('data/ml-1m/movies.dat', sep='::', header=None, names=movies_names, encoding='latin-1', engine='python')
+        self._movies = pd.read_table(movies_path, sep='::', header=None, names=movies_names, encoding='latin-1', engine='python')
     
     @staticmethod
     def slice_window(events, max_history_length):
