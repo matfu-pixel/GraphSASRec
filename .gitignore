@@ -131,3 +131,7 @@ logs/
 *.fdb_latexmk
 *.pkl
 *.pth
+*.svg
+*.nav
+*.snm
+*.toc
