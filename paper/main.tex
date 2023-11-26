@@ -14,53 +14,24 @@
 \usepackage{natbib}
 \usepackage{doi}
 
+% \usepackage[
+% backend=biber,
+% style=alphabetic,
+% sorting=ynt
+% ]{biblatex}
+
 
 
 \title{GraphSASRec: модель последовательных рекомендаций на основе самовнивания, дополненная графовыми представлениями.}
 
-\author{ David S.~Hippocampus\thanks{Use footnote for providing further
-		information about author (webpage, alternative
-		address)---\emph{not} for acknowledging funding agencies.} \\
-	Department of Computer Science\\
-	Cranberry-Lemon University\\
-	Pittsburgh, PA 15213 \\
-	\texttt{hippo@cs.cranberry-lemon.edu} \\
-	%% examples of more authors
-	\And
-	Elias D.~Striatum \\
-	Department of Electrical Engineering\\
-	Mount-Sheikh University\\
-	Santa Narimana, Levand \\
-	\texttt{stariate@ee.mount-sheikh.edu} \\
-	%% \AND
-	%% Coauthor \\
-	%% Affiliation \\
-	%% Address \\
-	%% \texttt{email} \\
-	%% \And
-	%% Coauthor \\
-	%% Affiliation \\
-	%% Address \\
-	%% \texttt{email} \\
-	%% \And
-	%% Coauthor \\
-	%% Affiliation \\
-	%% Address \\
-	%% \texttt{email} \\
+\author{ 
+	\textbf{Матвеев Артем} \\
+    Московский государственный университет имени М. В. Ломоносова \\
+	\texttt{matfu21@ya.ru} \\
 }
-\date{}
+\date{2023}
 
-\renewcommand{\shorttitle}{\textit{arXiv} Template}
-
-%%% Add PDF metadata to help others organize their library
-%%% Once the PDF is generated, you can check the metadata with
-%%% $ pdfinfo template.pdf
-\hypersetup{
-pdftitle={A template for the arxiv style},
-pdfsubject={q-bio.NC, q-bio.QM},
-pdfauthor={David S.~Hippocampus, Elias D.~Striatum},
-pdfkeywords={First keyword, Second keyword, More},
-}
+\renewcommand{\shorttitle}{}
 
 \begin{document}
 \maketitle
@@ -71,98 +42,91 @@ pdfkeywords={First keyword, Second keyword, More},
 	основе кодирования его исторических событий, являются популярным решением для построение 
 	персонализированных рекомендательных систем как в индустрии, так и в академии. Преимуществами 
 	таких моделей являются: учет порядка, в котором следуют исторические события и оценка долгосрочных 
-	интересов пользователя. Однако подобные подходы недостаточно эксплуатируют полезный коллаборативный 
+	интересов пользователя. Однако подобные подходы недостаточно эксплуатируют полезный коллаборативный
 	сигнал и плохо представляют объекты из длинного хвоста. Популярным решением этих проблем являются 
 	методы, основанные на применении графовых нейронных сетей к двудольному графу взаимодействий 
-	пользователя. В данной работе предлагается объединить два этих подхода. Наблюдаемые результаты 
-	демонстрируют улучшение с точки зрения метрик ранжирования и разнообразия выдачи, особенно на 
-	срезах с объектами из длинного хвоста.
+	пользователей. В работе предлагается с другой стороны взглянуть на модель последовательных рекомендаций
+	как на графовую сеть со стороны пользователя. Предлагается метод увеличения глубины этой сети,
+	сохраняющий длину истории пользователя, при этом имея минимальные накладные расходы. Наблюдаемые 
+	результаты демонстрируют улучшение с точки зрения метрик ранжирования и разнообразия выдачи.
 \end{abstract}
 
 
-\keywords{First keyword \and Second keyword \and More}
+\keywords{Информационный поиск \and Последовательные рекомендации \and Графовые нейронные сети}
 
-\section{Introduction}
-\lipsum[2]
-\lipsum[3]
+\section{Введение}
 
-\section{Headings: first level}
-\label{sec:headings}
+Последовательные рекомендательные системы - это класс рекомендательных систем, которые принимают 
+во внимание порядок взаимодействий пользователя и пытаются предсказать следующее его взаимодейсвие.
+Учет порядка является важной состоявляющей во многих рекомендательных сценариях: если пользователь
+только что купил мобильный телефон, то следующая покупка с большой долей вероятности будет 
+аксессуаром к нему. Ранее такая задача решалась с помощью подходов, основанных на Марковских 
+цепях \cite{mc} или рекуррентных нейронных сетях \cite{rnn1,rnn2,rnn3}. Но после появления архитектуры
+трансформер \cite{transformer} и его успеха в задачах распознования естественного языка, наиболее успешными
+стали модели, основанные на обработке последовательностей действий пользователя с помощью трансформера 
+\cite{sasrec,bert4rec,gsasrec}. 
 
-\lipsum[4] See Section \ref{sec:headings}.
+Другим популярным подходом в рекомендательных системах являются графовые нейронные 
+сети \cite{lightgcn,lightgcl,hetergcl,herograph,slgcn}. В этом подходе информация, которая есть в рекомендательной 
+системе, рассматривается с точки зрения графов. Большинство данных в любой рекомендательной системе по
+существу имееют графовую структуру. Например, данные взаимодействий в рекомендательном сервисе могут быть
+представлены в ввиде двудольного графа, вершины одной доли которого - пользователи, другой объекты (например, товары), а
+наблюдаемый взаимодейсвия - ребра. Пусть нам дан такой граф. Ключевая идея графовых нейронный сетей заключается в
+итеративной агрегации признаковых представлений соседей в графе и объединение этой агрегированной информации
+с представлением вершины, для которой рассматривается соседство \cite{survey1}. Такая операция называется распространением
+сообщений \cite{lightgcn,sage}. Формально ее можно записать в следующем виде:
 
-\subsection{Headings: second level}
-\lipsum[5]
-\begin{equation}
-	\xi _{ij}(t)=P(x_{t}=i,x_{t+1}=j|y,v,w;\theta)= {\frac {\alpha _{i}(t)a^{w_t}_{ij}\beta _{j}(t+1)b^{v_{t+1}}_{j}(y_{t+1})}{\sum _{i=1}^{N} \sum _{j=1}^{N} \alpha _{i}(t)a^{w_t}_{ij}\beta _{j}(t+1)b^{v_{t+1}}_{j}(y_{t+1})}}
-\end{equation}
+$$
+Aggregation: n^{(l)}_v = Aggregator_l(\{h^l_u, \forall u \in \mathcal{N}_v\}),
+$$
+$$
+Update: h^{(l + 1)}_v = Updater_l(h_v^{(l)}, n_v^{(l)}),
+$$
 
-\subsubsection{Headings: third level}
-\lipsum[6]
-
-\paragraph{Paragraph}
-\lipsum[7]
-
-
-
-\section{Examples of citations, figures, tables, references}
-\label{sec:others}
-
-\subsection{Citations}
-Citations use \verb+natbib+. The documentation may be found at
-\begin{center}
-	\url{http://mirrors.ctan.org/macros/latex/contrib/natbib/natnotes.pdf}
-\end{center}
-
-Here is an example usage of the two main commands (\verb+citet+ and \verb+citep+): Some people thought a thing \citep{kour2014real, hadash2018estimate} but other people thought something else \citep{kour2014fast}. Many people have speculated that if we knew exactly why \citet{kour2014fast} thought this\dots
-
-\subsection{Figures}
-\lipsum[10]
-See Figure \ref{fig:fig1}. Here is how you add footnotes. \footnote{Sample of the first footnote.}
-\lipsum[11]
-
-% \begin{figure}
-% 	\centering
-% 	\includegraphics[width=0.5\textwidth]{../figures/log_reg_cs_exp.eps}
-% 	\caption{Sample figure caption.}
-% 	\label{fig:fig1}
-% \end{figure}
-
-\subsection{Tables}
-See awesome Table~\ref{tab:table}.
-
-The documentation for \verb+booktabs+ (`Publication quality tables in LaTeX') is available from:
-\begin{center}
-	\url{https://www.ctan.org/pkg/booktabs}
-\end{center}
+где $h_u^{(l)}$ определяется как представление вершины $u$ после $l$-ого слоя графовой сети. $Aggregator_l$ и $Update_l$
+представляют собой обучаемые функции агрегации соседей и обновления представления вершины на $l$-ом слое. В качестве функции 
+агрегации могут выступать как простые варианты по типу max-pooling, mean-pooling \cite{sage}, так и более сложные, например: 
+importance-pooling \cite{pinsage}, агрегация на основе контекста \cite{multisage}, механизм внимания \cite{gat}, агрегация
+на базе трансформера \cite{multibisage}. В качестве функции обновления могут выступать как простые архитектуры на базе несколькоих
+полносвязных слоев \cite{sage, pinsage}, так и более сложные на базе трансформера \cite{multibisage}.
 
 
-\begin{table}
-	\caption{Sample table title}
-	\centering
-	\begin{tabular}{lll}
-		\toprule
-		\multicolumn{2}{c}{Part}                   \\
-		\cmidrule(r){1-2}
-		Name     & Description     & Size ($\mu$m) \\
-		\midrule
-		Dendrite & Input terminal  & $\sim$100     \\
-		Axon     & Output terminal & $\sim$10      \\
-		Soma     & Cell body       & up to $10^6$  \\
-		\bottomrule
-	\end{tabular}
-	\label{tab:table}
-\end{table}
-
-\subsection{Lists}
-\begin{itemize}
-	\item Lorem ipsum dolor sit amet
-	\item consectetur adipiscing elit.
-	\item Aliquam dignissim blandit est, in dictum tortor gravida eget. In ac rutrum magna.
-\end{itemize}
+продолжения...
 
 
-\bibliographystyle{unsrtnat}
+
+
+\section{Постановка задачи}
+
+\subsection{Последовательные рекомендации}
+В последовательных рекомендациях рассматривается задача предсказания следующего положительного взаимодействия 
+пользователя по последовательности его исторических действий $S^u = (S_1^u, S_2^u, \dots, S_{|S^u|}^u)$.
+Во время обучения, на момент времени $t$, модель предсказывает следующий объект интереса пользователя на основе его
+взаимодействий, произошедших раньше момента $t$. На вход модели поступает последоватлеьность
+$(S_1^u, S_2^u, \dots, S^u_{|S^u| - 1})$. Ожидаемый выход модели - следующее положительное взаимодействия $S^u_{|S^u|}$. 
+В данной работе рассматривается модель SASRec \citep{sasrec}, в основе которой лежит декодер блок трансформера \cite{transformer},
+на выходе которого тоже последовательность. 
+Поэтому задачу можно переформулировать в эквивалентном виде, как задачу предсказания сдвинутой версии 
+последовательности $(S_2^u, S_3^u, \dots, S^u_{|S^u|})$.
+
+\subsection{Предсказание ребра}
+
+Дан граф $G = (V, E, X)$, где $V$ - множество вершин, $E$ - множество ребер, $X \in \mathbb{R}^{|V| \times d}$
+- $d$-размерные векторные представления входных вершин. Задача предсказания ребра формулируется как задача
+определения существования (или появления в будущем, если граф рассматривается как динамический \cite{dyngnn}) ребра $e_{ij}$
+между вершинами $i$ и $j$, где $i, j \in V$, и $e_{ij} \not \in E$.
+
+\section{Сопутствующие работы}
+
+
+
+\section{Метод}
+
+\section{Эксперименты}
+
+\section{Заключение}
+
+\bibliographystyle{abbrv}
 \bibliography{references}
 
 \end{document}
